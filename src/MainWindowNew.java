@@ -6,10 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 
 /**
  * Created by Роман on 02.11.2020.
@@ -33,7 +30,7 @@ public class MainWindowNew extends JFrame {
 
     public MainWindowNew() throws Exception {
 
-        setTitle("Финансовое планирование");
+        setTitle("Финансовое планирование" + " ver. " + Open.actualVersion);
         //setLocationRelativeTo(null);
         setPanel(desktopPane, "Panel", 0, 0);
         setDesktopPane();

@@ -3,7 +3,6 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.basic.BasicPanelUI;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,7 +14,7 @@ import java.util.Vector;
 /**
  * Created by ����� on 13.10.2020.
  */
-public class FormCreator {
+public final class FormCreator {
 
     private char dm = (char) 34;
 
@@ -33,7 +32,7 @@ public class FormCreator {
         mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
 
         //Проверим, есть ли подключение
-        Boolean isConnect = Open.httpConnect.getConnect();
+        Boolean isConnect = Open.isConnect;
         //Boolean isConnect = false;
 
         //Если его нет - загрузим сохраненные ранее настройки формы,если они есть
@@ -46,6 +45,7 @@ public class FormCreator {
 
         }else {
 
+            //String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Entities.Section ParameterValue=" + name + "</Parameter></XML_Parameters>";
             String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Section ParameterValue=" + name + "</Parameter></XML_Parameters>";
 
             FormElements = Open.LoadValue("FormSettings", xml_parameters);
@@ -117,6 +117,7 @@ public class FormCreator {
             DefaultTableModel tableModel = new DefaultTableModel();
             JTable table = new JTable(tableModel);
 
+            //String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Entities.Section ParameterValue=" + nameSection + "</Parameter><Parameter>ParameterName=TableName ParameterValue=" + nameElement + "</Parameter></XML_Parameters>";
             String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Section ParameterValue=" + nameSection + "</Parameter><Parameter>ParameterName=TableName ParameterValue=" + nameElement + "</Parameter></XML_Parameters>";
 
             ArrayList<RowRequest> TableColumns = Open.LoadValue("TableColumns", xml_parameters);
@@ -221,6 +222,7 @@ public class FormCreator {
 
     private DefaultTableModel addTableColumns(DefaultTableModel TableModel,String name,String nameElement, JTable table) throws Exception {
 
+        //String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Entities.Section ParameterValue=" + name + "</Parameter><Parameter>ParameterName=TableName ParameterValue=" + nameElement + "</Parameter></XML_Parameters>";
         String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Section ParameterValue=" + name + "</Parameter><Parameter>ParameterName=TableName ParameterValue=" + nameElement + "</Parameter></XML_Parameters>";
 
         ArrayList<RowRequest> TableColumns = Open.LoadValue("TableColumns", xml_parameters);

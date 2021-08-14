@@ -18,12 +18,14 @@ public class Open {
     public static String pathSave = "C:/FinancialPlanning";
     public static ArrayList<RowRequest> buttonsMainWindow = new ArrayList();
     public static SaveSettingsProgram saveSettingsProgram = new SaveSettingsProgram();
+    public static final String actualVersion = "1.0";
+    public static Boolean isConnect;
 
 
     public static void main(String args[]) throws Exception {
 
         /*char dm = (char) 34;
-        String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Section ParameterValue=Активы и пассивы</Parameter><Parameter>ParameterName=TableName ParameterValue=Активы</Parameter></XML_Parameters>";
+        String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Entities.Section ParameterValue=Активы и пассивы</Parameter><Parameter>ParameterName=TableName ParameterValue=Активы</Parameter></XML_Parameters>";
 
         ArrayList<RowRequest> TableColumns = LoadValue("TableColumns", xml_parameters);
 
@@ -33,8 +35,14 @@ public class Open {
 
         }*/
 
-        LoadInitialValues();
+        /*Проверяем, есть ли соединение с базой настроек
+          Инициализируем переменную для будущего использования*/
 
+        isConnect = httpConnect.getConnect();
+
+
+        //Инициализируем
+        LoadInitialValues(isConnect);
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -60,14 +68,13 @@ public class Open {
             folder.mkdir();
 
         }
-        File folderSettingForms = new File(pathSave+"/SettingForms");
+        File folderSettingForms = new File(pathSave+"/SettingsForms");
         if (!folderSettingForms.exists()) {
             folderSettingForms.mkdir();
 
         }
 
-
-        String mess = getMessage();
+        String mess = getMessage(isConnect);
 
         Start start = new Start(mess);
         //start.setLocationRelativeTo(null);
@@ -86,10 +93,9 @@ public class Open {
 
     }
 
-    private static String getMessage() throws IOException {
-        String mess = "";
+    private static String getMessage(Boolean isConnect) throws IOException {
 
-        Boolean isConnect = httpConnect.getConnect();
+        String mess = "";
 
         if (!isConnect){return mess = "Нет связи с сервером...";}
 
@@ -103,9 +109,7 @@ public class Open {
         return httpConnect;
     }
 
-    public static void LoadInitialValues() throws Exception {
-
-        final Boolean isConnect = httpConnect.getConnect();
+    public static void LoadInitialValues(Boolean isConnect) throws Exception {
 
        // Thread myThreadActivePassive = new Thread(new Runnable() {
        //     public void run()
@@ -123,7 +127,7 @@ public class Open {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
+                //Переделать на загрузку из настроек
                 try {
 
                     ArrayList<String> listActive = new ArrayList();
@@ -167,12 +171,12 @@ public class Open {
 
     private static ArrayList arrayListValue(String id, String XmlParameters) throws Exception {
 
-            HttpClient hc = gethttpConnect();
-            hc.setXml_parameters(XmlParameters);
-            hc.setID(id);
-            StringBuilder responseActive = hc.sendGet();
+        HttpClient hc = gethttpConnect();
+        hc.setXml_parameters(XmlParameters);
+        hc.setID(id);
+        StringBuilder responseActive = hc.sendGet();
 
-            return (ArrayList) new UnmarshallRequest().getUnmarshall(responseActive);
+        return (ArrayList) new UnmarshallRequest().getUnmarshall(responseActive);
 
     }
 

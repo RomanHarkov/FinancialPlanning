@@ -1,6 +1,5 @@
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -8,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-//import Images.*;
 
 /**
  * Created by Роман on 14.10.2020.
@@ -18,7 +16,6 @@ public class Start extends JFrame{
     private JButton ok = new JButton("Ок");
     private JButton cancel = new JButton("Отмена");
     private JButton registration = new JButton("Регистрация");
-
 
     private JTextField loginField;
     private JPasswordField passwordField;

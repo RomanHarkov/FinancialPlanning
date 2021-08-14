@@ -49,6 +49,7 @@ public class FormSettings extends JFrame {
 
                 if (Mode.equals("Базовый")){
 
+                    //NodeList nnSection = (NodeList) nodeList.item(i).getAttributes().getNamedItem("Entities.Section");
                     NodeList nnSection = (NodeList) nodeList.item(i).getAttributes().getNamedItem("Section");
 
 

@@ -2,7 +2,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 /**
- * Created by Роман on 20.11.2020.
+ * Created by Р РѕРјР°РЅ on 20.11.2020.
  */
 public class RowRequest implements Serializable{
 
