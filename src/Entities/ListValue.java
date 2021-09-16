@@ -3,7 +3,7 @@ package Entities;
 import java.util.ArrayList;
 
 /**
- * Created by ����� on 23.03.2021.
+ * Created by Роман on 23.03.2021.
  */
 public class ListValue {
 
@@ -15,9 +15,17 @@ public class ListValue {
 
     }
 
-    public void addList(String value){
+    //Добавление значения в список
+    public void addToList(String value){
 
         this.list.add(value);
+
+    }
+
+    //Добавление готового списка
+    public void addList(ArrayList<String> list){
+
+        this.list = list;
 
     }
 
@@ -31,6 +39,7 @@ public class ListValue {
 
         return this.name;
     }
+
 
     public void setName(String name){
 

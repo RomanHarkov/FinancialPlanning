@@ -1,9 +1,14 @@
+import Entities.ListValue;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * Created by Роман on 14.10.2020.
@@ -16,10 +21,13 @@ public class Open {
     public static int windowOffset = 0;
     public static final int indexOffset = 30;
     public static String pathSave = "C:/FinancialPlanning";
-    public static ArrayList<RowRequest> buttonsMainWindow = new ArrayList();
+    //public static ArrayList<RowRequest> buttonsMainWindow = new ArrayList();
     public static SaveSettingsProgram saveSettingsProgram = new SaveSettingsProgram();
     public static final String actualVersion = "1.0";
     public static Boolean isConnect;
+    public static Properties appProps = new Properties();
+    public static ArrayList<String> listSettings = getListSettings();
+
 
 
     public static void main(String args[]) throws Exception {
@@ -35,9 +43,10 @@ public class Open {
 
         }*/
 
+        appProps.load(new FileInputStream("src/Settings/connection parameters.properties"));
+
         /*Проверяем, есть ли соединение с базой настроек
           Инициализируем переменную для будущего использования*/
-
         isConnect = httpConnect.getConnect();
 
 
@@ -111,51 +120,33 @@ public class Open {
 
     public static void LoadInitialValues(Boolean isConnect) throws Exception {
 
-       // Thread myThreadActivePassive = new Thread(new Runnable() {
-       //     public void run()
-        //    {
+        //Получить по списку данные из 1С, записать их куда-то и сохранить в файл
 
-                try {
+        if (!isConnect){
 
-                    if (!isConnect){
-                        buttonsMainWindow = saveSettingsProgram.RestoreArrList("ListOfSections");
-                    }else {
-                        buttonsMainWindow = LoadValue("ListOfSections");
-                        saveSettingsProgram.SaveArrList("ListOfSections", buttonsMainWindow);
+        }else {
+        for (int i = 0; i<listSettings.size(); i++){
+
+            final String nameList = listSettings.get(i);
+            final ArrayList<RowRequest> value = LoadValue(nameList);
+
+            listValues.put(nameList, value);
+
+            Thread myThread = new Thread(new Runnable() {
+                public void run() //Этот метод будет выполняться в побочном потоке
+                {
+
+                    try {
+                        Open.saveSettingsProgram.SaveArrList(nameList, value);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-                //Переделать на загрузку из настроек
-                try {
+            });
+            myThread.start();
 
-                    ArrayList<String> listActive = new ArrayList();
-                    ArrayList<String> listPassive = new ArrayList();
-
-                    if (!isConnect){
-                        listActive   = saveSettingsProgram.RestoreArrList("listActive");
-                        listPassive  = saveSettingsProgram.RestoreArrList("listPassive");
-                    }else {
-
-                        listActive  = LoadValue("listActive");
-                        saveSettingsProgram.SaveArrList("listActive", listActive);
-
-                        listPassive = LoadValue("listPassive");
-                        saveSettingsProgram.SaveArrList("listPassive", listPassive);
-                    }
-
-                    addListAtListValues(listActive, "listActive");
-                    addListAtListValues(listPassive, "listPassive");
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            //}
-        //});
-        //myThreadActivePassive.start();
-        //myThreadActivePassive.sleep(500);
+            }
+        }
 
     }
 
@@ -176,14 +167,21 @@ public class Open {
         hc.setID(id);
         StringBuilder responseActive = hc.sendGet();
 
-        return (ArrayList) new UnmarshallRequest().getUnmarshall(responseActive);
+        //return (ArrayList) new UnmarshallRequest().getUnmarshall(responseActive);
+        return (ArrayList) new UnmarshallRequest().getUnmarshallJSON(responseActive);
 
     }
 
-    private static void addListAtListValues(ArrayList list, String key){
+    //Список ID настроек для загрузки
+    private static ArrayList<String> getListSettings(){
 
-        listValues.put(key,list);
+        ArrayList<String> arrayList = new ArrayList<>();
 
+        arrayList.add("ListOfSections");
+        arrayList.add("IndicatorsOfSection");
+
+
+        return arrayList;
     }
 
 }

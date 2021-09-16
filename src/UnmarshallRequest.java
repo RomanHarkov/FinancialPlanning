@@ -1,4 +1,8 @@
 import com.sun.org.apache.xerces.internal.dom.DeferredElementImpl;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -13,7 +17,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 
 /**
- * Created by ����� on 15.11.2020.
+ * Created by Роман on 15.11.2020.
  */
 public class UnmarshallRequest {
 
@@ -21,15 +25,15 @@ public class UnmarshallRequest {
 
     }
 
-    public ArrayList<RowRequest> getUnmarshall(StringBuilder request) throws ParserConfigurationException, IOException, SAXException {
+    //Парсинг XML
+    /*public ArrayList<RowRequest> getUnmarshall(StringBuilder request) throws ParserConfigurationException, IOException, SAXException {
 
-         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-         DocumentBuilder builder = factory.newDocumentBuilder();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
 
         StringReader stringReader = new StringReader(String.valueOf(request));
         InputSource is = new InputSource(stringReader);
 
-        //Document document = builder.parse(new InputSource(new StringReader(String.valueOf(request))));
         Document document = builder.parse(is);
         document.getDocumentElement().normalize();
 
@@ -47,8 +51,7 @@ public class UnmarshallRequest {
 
         }
 
-        ArrayList<RowRequest> table = new ArrayList<RowRequest>();
-
+        ArrayList<RowRequest> table = new ArrayList();
 
         for (int i = 0; i < rowNodeList.getLength(); i++){
 
@@ -68,6 +71,48 @@ public class UnmarshallRequest {
         }
 
         return  table;
+    }*/
+
+
+    //Парсинг JSON
+    public ArrayList<RowRequest> getUnmarshallJSON(StringBuilder request) throws ParseException {
+
+        ArrayList<RowRequest> table = new ArrayList();
+
+        JSONParser parser = new JSONParser();
+
+        Object obj = parser.parse(String.valueOf(request));
+        JSONObject value = (JSONObject) ((JSONObject) obj).get("#value");
+
+        JSONArray columns = (JSONArray) value.get("column");
+        JSONArray rows = (JSONArray) value.get("row");
+
+        if (rows==null){}else {
+
+            for (int row = 0; row < rows.size(); row++) {
+
+                RowRequest newRow = new RowRequest();
+
+                JSONArray arrRow = (JSONArray) rows.get(row);
+
+                    for (int col = 0; col < columns.size(); col++) {
+
+                    JSONObject strRow = (JSONObject) arrRow.get(col);
+                    String RowValue = (String) strRow.get("#value");
+
+                    JSONObject nameColumn = (JSONObject) columns.get(col);
+                    String colValue = (String) nameColumn.get("Name");
+
+                    newRow.addRow(colValue, RowValue);
+
+                }
+
+                table.add(newRow);
+            }
+        }
+
+        return table;
+
     }
 
-}
+    }

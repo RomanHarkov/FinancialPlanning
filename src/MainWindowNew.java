@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by Роман on 02.11.2020.
@@ -130,10 +131,13 @@ public class MainWindowNew extends JFrame {
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
         panel.setSize(1500, 40);
 
-        if (Open.buttonsMainWindow.size() > 0) {
-            for (int buttIndex = 0; buttIndex < Open.buttonsMainWindow.size(); buttIndex++) {
+        ArrayList<RowRequest> buttons = Open.listValues.get("ListOfSections");
 
-                String nameEl = Open.buttonsMainWindow.get(buttIndex).getRow().get("Наименование");
+        if (buttons.size() > 0) {
+            for (int buttIndex = 0; buttIndex < buttons.size(); buttIndex++) {
+
+                //String nameEl = Open.buttonsMainWindow.get(buttIndex);
+                String nameEl = buttons.get(buttIndex).getRow().get("Наименование");
 
                 addButton(panel, nameEl, Open.ColorButtons.get(buttIndex));
 
@@ -146,7 +150,6 @@ public class MainWindowNew extends JFrame {
                             try {
                                 NewFrame = formCreator.createJInternalFrame(finalName);
                                 NewFrame.setVisible(false);
-
 
                                 desktopPane.add(NewFrame);
                             } catch (Exception e) {

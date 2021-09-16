@@ -1,7 +1,7 @@
 package Entities;
 
 /**
- * Created by Роман on 06.07.2021.
+ * Created by Р РѕРјР°РЅ on 06.07.2021.
  */
 public class Indicator {
 

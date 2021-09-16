@@ -10,10 +10,6 @@ import java.nio.charset.StandardCharsets;
  */
 public class HttpClient {
 
-    private final String url = "http://localhost:80/InvestmentSettings";
-    private final String username = "Admin";
-    private final String password = "123";
-
     private String text;
     private String id;
     private String xml_parameters;
@@ -27,12 +23,12 @@ public class HttpClient {
 
         Authenticator.setDefault(new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password.toCharArray());
+                return new PasswordAuthentication(Open.appProps.getProperty("login"), Open.appProps.getProperty("password").toCharArray());
             }
         });
 
         //HttpURLConnection httpClient = (HttpURLConnection) new URL(url+"/hs/Query"+"?Text="+text+"&XML_parameters="+xml_parameters).openConnection();
-        httpClient = (HttpURLConnection) new URL(url+"/hs/Query").openConnection();
+        httpClient = (HttpURLConnection) new URL(Open.appProps.getProperty("url")+"/hs/Query").openConnection();
         httpClient.setDoOutput(true);
         httpClient.setDoInput(true);
         httpClient.setUseCaches(false);
@@ -76,7 +72,7 @@ public class HttpClient {
 
     public boolean getConnect() throws IOException {
 
-        HttpURLConnection httpClient = (HttpURLConnection) new URL(url).openConnection();
+        HttpURLConnection httpClient = (HttpURLConnection) new URL(Open.appProps.getProperty("url")).openConnection();
 
         if (httpClient.getResponseCode() == 200){
             httpClient.disconnect();

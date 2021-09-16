@@ -5,7 +5,7 @@ import Entities.ListValue;
 import java.util.ArrayList;
 
 /**
- * Created by Роман on 23.03.2021.
+ * Created by Р РѕРјР°РЅ on 23.03.2021.
  */
 public class Section {
 

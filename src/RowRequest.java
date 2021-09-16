@@ -4,7 +4,7 @@ import java.util.HashMap;
 /**
  * Created by Роман on 20.11.2020.
  */
-public class RowRequest implements Serializable{
+public class RowRequest extends HashMap<String, String> implements Serializable{
 
     private HashMap<String,String> row = new HashMap<String,String>();
 

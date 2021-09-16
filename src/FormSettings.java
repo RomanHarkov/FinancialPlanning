@@ -21,18 +21,13 @@ public class FormSettings extends JFrame {
 
         super("Настройки");
 
-        //JaxbWorker jw = new JaxbWorker();
-        //SettingProgram unmarshSettings = jw.fromXmlToObject("src/Settings/Settings.xml");
-        //for (SettingProgram sett : unmarshSettings.getName()) {}
-
         //HttpClient obj = new HttpClient();
         //obj.setText(text);
         //obj.setXml_parameters(xml_parameters);
 
         //StringBuilder response = obj.sendGet();
 
-        File xmlFile = new File("src/Settings/Settings.xml");
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+/*        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
         try {
             builder = factory.newDocumentBuilder();
@@ -140,6 +135,6 @@ public class FormSettings extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
-
+*/
     }
 }

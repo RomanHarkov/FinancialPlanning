@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Vector;
 
 /**
@@ -17,10 +18,13 @@ import java.util.Vector;
 public final class FormCreator {
 
     private char dm = (char) 34;
+    //Проверим, есть ли подключение
+    private Boolean isConnect = Open.isConnect;
+    //Boolean isConnect = false;
 
     public FormCreator(){ }
 
-    public JInternalFrame createJInternalFrame(String name) throws Exception {
+    public JInternalFrame createJInternalFrame(final String name) throws Exception {
 
         ArrayList<RowRequest> FormElements = new ArrayList();
 
@@ -31,11 +35,8 @@ public final class FormCreator {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
 
-        //Проверим, есть ли подключение
-        Boolean isConnect = Open.isConnect;
-        //Boolean isConnect = false;
 
-        //Если его нет - загрузим сохраненные ранее настройки формы,если они есть
+        //Если нет подключения - загрузим сохраненные ранее настройки формы,если они есть
         if (!isConnect){
 
             File fileFormElements = new File(Open.pathSave + "/SettingForms/" + name + ".txt");
@@ -45,12 +46,22 @@ public final class FormCreator {
 
         }else {
 
-            //String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Entities.Section ParameterValue=" + name + "</Parameter></XML_Parameters>";
             String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Section ParameterValue=" + name + "</Parameter></XML_Parameters>";
 
             FormElements = Open.LoadValue("FormSettings", xml_parameters);
-            Open.saveSettingsProgram.SaveFormElements(name, FormElements);
+            final ArrayList<RowRequest> finalFormElements = FormElements;
+            Thread myThread = new Thread(new Runnable() {
+                   public void run() //Этот метод будет выполняться в побочном потоке
+                   {
 
+                       try {
+                           Open.saveSettingsProgram.SaveFormElements(name, finalFormElements);
+                       } catch (InterruptedException e) {
+                           e.printStackTrace();
+                       }
+                   }
+                });
+                myThread.start();
         }
 
         if (FormElements.size() > 0){
@@ -60,13 +71,14 @@ public final class FormCreator {
 
             for (int ElementIndex=0; ElementIndex < FormElements.size(); ElementIndex++){
 
-                String typeElement = FormElements.get(ElementIndex).getRow().get("Type");
-                String nameElement = FormElements.get(ElementIndex).getRow().get("Name");
-                String parentElement = FormElements.get(ElementIndex).getRow().get("Parent");
+                HashMap<String,String> row = FormElements.get(ElementIndex).getRow();
+
+                String typeElement = row.get("Type");
+                String nameElement = row.get("Name");
 
                 listElements[ElementIndex][0] = nameElement;
                 listElements[ElementIndex][1] = typeElement;
-                listElements[ElementIndex][2] = parentElement;
+                listElements[ElementIndex][2] = row.get("Parent");
 
                 if (typeElement.equals("GroupHorizontal")){
 
@@ -126,18 +138,23 @@ public final class FormCreator {
 
             for (int i = 0; i<TableColumns.size(); i++){
 
-                String columnName = TableColumns.get(i).getRow().get("ИмяКолонки");
+                HashMap<String, String> row_tc = TableColumns.get(i).getRow();
+
+                String columnName = row_tc.get("ИмяКолонки");
 
                 tableModel.addColumn(columnName);
 
-                if (TableColumns.get(i).getRow().get("ТипКолонки").equals("List")){
+                if (row_tc.get("ТипКолонки").equals("List")){
 
-                    String IDList = TableColumns.get(i).getRow().get("ИдентификаторСвязиСписка");
+                    ArrayList<RowRequest> Indicators = Open.listValues.get("IndicatorsOfSection");
 
-                    ArrayList<RowRequest> list = Open.listValues.get(IDList);
+                    for (int y=0; y < Indicators.size(); y++){
 
-                    for (int y=0;y<list.size();y++){
-                        listCol.add(list.get(y).getRow().get("Наименование"));
+                        HashMap<String,String> Row = Indicators.get(y).getRow();
+
+                        if (Row.get("Section").equals(nameSection) & Row.get("Table").equals(nameElement) & Row.get("Column").equals(columnName)){
+                            listCol.add(Row.get("Name"));
+                        }
                     }
                 }
             }
@@ -190,6 +207,10 @@ public final class FormCreator {
             button.setUI(new BasicButtonUI());
             button.setVerticalTextPosition(AbstractButton.CENTER);
             button.setHorizontalTextPosition(AbstractButton.LEADING);
+            /*button.setBackground(new Color(0,51,204));//import java.awt.Color;
+            button.setForeground(Color.WHITE);
+            button.setFocusPainted(false);
+            button.setBorderPainted(false);*/
 
             final ActionListener actionListener = new ActionListener() {
 
@@ -218,44 +239,6 @@ public final class FormCreator {
 
         button.addActionListener(addActionButton(table, tableModel, action));
         return button;
-    }
-
-    private DefaultTableModel addTableColumns(DefaultTableModel TableModel,String name,String nameElement, JTable table) throws Exception {
-
-        //String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Entities.Section ParameterValue=" + name + "</Parameter><Parameter>ParameterName=TableName ParameterValue=" + nameElement + "</Parameter></XML_Parameters>";
-        String xml_parameters = "<?xml version="+dm+"1.0"+dm+" encoding="+dm+"UTF-8"+dm+"?><XML_Parameters><Parameter>ParameterName=Section ParameterValue=" + name + "</Parameter><Parameter>ParameterName=TableName ParameterValue=" + nameElement + "</Parameter></XML_Parameters>";
-
-        ArrayList<RowRequest> TableColumns = Open.LoadValue("TableColumns", xml_parameters);
-
-        for (int i = 0; i<TableColumns.size(); i++){
-
-            String columnName = TableColumns.get(i).getRow().get("ИмяКолонки");
-
-            TableModel.addColumn(columnName);
-
-            if (TableColumns.get(i).getRow().get("ТипКолонки").equals("List")){
-
-                String IDList = TableColumns.get(i).getRow().get("ИдентификаторСвязиСписка");
-
-                JComboBox<String> comboBox = new JComboBox<>();
-
-                TableColumn column = table.getColumnModel().getColumn(i);
-
-                ArrayList<RowRequest> list = Open.listValues.get(IDList);
-
-                for (int y=0;y<list.size();y++){
-
-                    comboBox.addItem(list.get(y).getRow().get("Наименование"));
-
-                }
-
-                column.setCellEditor(new DefaultCellEditor(comboBox));
-                //table.setColumnSelectionAllowed(true);
-            }
-
-        }
-
-        return TableModel;
     }
 
     final private ActionListener addActionButton(final JTable table, final DefaultTableModel tableModel, final String action){
